@@ -524,12 +524,12 @@
     ['ho_ten','dien_thoai','email','khoa_hoc','lich_hoc','loi_nhan','_honey'].forEach(function(k){
       if(form[k]) data.append(k, form[k].value);
     });
-    fetch(ENDPOINT,{method:'POST',mode:'no-cors',body:data})
-      .then(done)
+    // Gửi nền (keepalive) — phản hồi là opaque (no-cors) nên không cần chờ; hiện lời cảm ơn ngay.
+    fetch(ENDPOINT,{method:'POST',mode:'no-cors',body:data,keepalive:true})
       .catch(function(){
-        btn.disabled=false;btn.textContent='Gửi đăng ký';
         alert('Có lỗi khi gửi. Vui lòng nhắn Zalo Ms. Uyên: https://zalo.me/0869688153');
       });
+    done();
   });
 </script>
 </body>
