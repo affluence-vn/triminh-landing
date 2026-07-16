@@ -214,6 +214,15 @@
     .eyebrow{margin:0 auto}
   }
 </style>
+
+<!-- Google Analytics — chung cho mọi landing page affluence.vn -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PGTR9CTWS2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PGTR9CTWS2');
+</script>
 </head>
 <body>
 
@@ -502,7 +511,7 @@
   });
 
   // === Lead backend — shared Affluence Apps Script Web App ===
-  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzGsRtSIzAHBPjuWWGrtaoNoChTBQm57FolpeP4jTMVaZ9IHPx8LEurANO2TolaIEvW/exec';
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwucHt7mWkNfYB-x6ulnBSe0Utbk-2DGyGvruMgGvr8ljGmzHFPC17B6ozChYUjr1i0/exec';
   var CLIENT = 'triminh';
 
   var form=document.getElementById('regForm');
@@ -519,18 +528,37 @@
       document.getElementById('dang-ky').scrollIntoView({behavior:'smooth',block:'center'});
     }
 
+    var leadId='LD-'+Math.random().toString(36).slice(2,10);
     var data=new URLSearchParams();
     data.append('client', CLIENT);
     ['ho_ten','dien_thoai','email','khoa_hoc','lich_hoc','loi_nhan','_honey'].forEach(function(k){
       if(form[k]) data.append(k, form[k].value);
     });
+    data.append('lead_id', leadId);
     // Gửi nền (keepalive) — phản hồi là opaque (no-cors) nên không cần chờ; hiện lời cảm ơn ngay.
     fetch(ENDPOINT,{method:'POST',mode:'no-cors',body:data,keepalive:true})
       .catch(function(){
         alert('Có lỗi khi gửi. Vui lòng nhắn Zalo Ms. Uyên: https://zalo.me/0869688153');
       });
+    gtag('event','generate_lead',{course:data.get('khoa_hoc')||'',lead_id:leadId});
     done();
   });
+
+  // ---- GA event hooks ----
+  (function () {
+    var regForm = document.getElementById('regForm');
+    if (regForm) {
+      var started = false;
+      regForm.addEventListener('focusin', function () {
+        if (!started) { started = true; gtag('event', 'form_start', { form_id: 'regForm' }); }
+      });
+    }
+    document.querySelectorAll('a[href*="zalo.me"]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        gtag('event', 'zalo_click', { placement: a.className || 'link' });
+      });
+    });
+  })();
 </script>
 </body>
 </html>
