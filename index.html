@@ -501,18 +501,9 @@
     else{m.style.display='flex';m.style.position='absolute';m.style.top='72px';m.style.left='0';m.style.right='0';m.style.flexDirection='column';m.style.background='#fff';m.style.padding='16px 22px';m.style.gap='16px';m.style.borderBottom='1px solid var(--line)';m.style.boxShadow='var(--shadow)';}
   });
 
-  // === Google Form backend (điền sau khi tạo form ở Bước 3) ===
-  var GFORM = {
-    action: 'https://docs.google.com/forms/d/e/FORM_ID/formResponse',
-    map: {
-      ho_ten:'entry.PLACEHOLDER',
-      dien_thoai:'entry.PLACEHOLDER',
-      email:'entry.PLACEHOLDER',
-      khoa_hoc:'entry.PLACEHOLDER',
-      lich_hoc:'entry.PLACEHOLDER',
-      loi_nhan:'entry.PLACEHOLDER'
-    }
-  };
+  // === Lead backend — shared Affluence Apps Script Web App ===
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzGsRtSIzAHBPjuWWGrtaoNoChTBQm57FolpeP4jTMVaZ9IHPx8LEurANO2TolaIEvW/exec';
+  var CLIENT = 'triminh';
 
   var form=document.getElementById('regForm');
   form.addEventListener('submit',function(e){
@@ -528,12 +519,12 @@
       document.getElementById('dang-ky').scrollIntoView({behavior:'smooth',block:'center'});
     }
 
-    // Nếu chưa cấu hình Google Form (còn PLACEHOLDER) -> vẫn hiện màn hình cảm ơn khi test.
-    if(GFORM.action.indexOf('FORM_ID')>-1){ done(); return; }
-
-    var fd=new FormData();
-    for(var k in GFORM.map){ if(form[k]) fd.append(GFORM.map[k], form[k].value); }
-    fetch(GFORM.action,{method:'POST',mode:'no-cors',body:fd})
+    var data=new URLSearchParams();
+    data.append('client', CLIENT);
+    ['ho_ten','dien_thoai','email','khoa_hoc','lich_hoc','loi_nhan','_honey'].forEach(function(k){
+      if(form[k]) data.append(k, form[k].value);
+    });
+    fetch(ENDPOINT,{method:'POST',mode:'no-cors',body:data})
       .then(done)
       .catch(function(){
         btn.disabled=false;btn.textContent='Gửi đăng ký';
